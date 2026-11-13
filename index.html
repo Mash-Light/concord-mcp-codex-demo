@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#080b12" />
+    <title>ORBIT — Mission Control</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <a class="brand" href="#" aria-label="Orbit home">
+<span class="brand-mark">◉</span>
+<span>orbit<span class="brand-dot">.</span>
+</span>
+</a>
+        <div class="workspace-switch">
+<span class="workspace-icon">✳</span>
+<span>
+<small>WORKSPACE</small>
+<strong>Concord MCP demo</strong>
+</span>
+<span class="chevron">⌄</span>
+</div>
+        <div class="nav-label">WORKSPACE</div>
+        <nav class="nav-list" aria-label="Navegación principal">
+          <a class="nav-item active" href="#overview">
+<span>◫</span> Overview <kbd>⌘ 1</kbd>
+</a>
+          <a class="nav-item" href="#agents">
+<span>◎</span> Agentes <i class="nav-count" id="navAgentCount">0</i>
+</a>
+          <a class="nav-item" href="#tasks">
+<span>◷</span> Tareas <i class="nav-count" id="navTaskCount">0</i>
+</a>
+          <a class="nav-item" href="#activity">
+<span>⌁</span> Actividad</a>
+        </nav>
+        <div class="sidebar-bottom">
+<div class="connection">
+<span class="pulse-dot">
+</span>
+<span>CONCORD MCP <b>● WORKSPACE</b>
+</span>
+</div>
+<div class="profile">
+<div class="avatar user-avatar">FC</div>
+<span>
+<strong>Codex local</strong>
+<small>Workspace de prueba</small>
+</span>
+<span class="more">···</span>
+</div>
+</div>
+      </aside>
+
+      <main class="main" id="overview">
+        <header class="topbar">
+<div class="breadcrumbs">Workspace <span>/</span> <strong>Mission control</strong>
+</div>
+<div class="topbar-right">
+<span class="live-label" id="topStatus">
+<span class="pulse-dot">
+</span> CONCORD LOCAL</span>
+<button class="icon-button" aria-label="Notificaciones">♧<i>
+</i>
+</button>
+<div class="avatar user-avatar small-avatar">FC</div>
+</div>
+</header>
+        <section class="content">
+          <div class="hero-row">
+<div>
+<div class="eyebrow">
+<span class="eyebrow-line">
+</span> WORKSPACE LOCAL · CONCORD MCP</div>
+<h1>Mission control<span>.</span>
+</h1>
+<p class="subhead">La actividad real de tus agentes, en un solo lugar.</p>
+</div>
+<button class="primary-button" id="runDemo">
+<span>↓</span> Ir al tablero <kbd>⌘ ↵</kbd>
+</button>
+</div>
+
+          <section class="mcp-live-panel" aria-live="polite">
+<div class="mcp-live-top">
+<div class="mcp-live-title">
+<span class="live-orbit">◉</span>
+<div>
+<strong>Concord MCP</strong>
+<small>Estado leído directamente del workspace local</small>
+</div>
+</div>
+<div class="mcp-live-state" id="mcpConnection">
+<i class="pulse-dot">
+</i>
+<span id="mcpConnectionText">CONECTANDO</span>
+</div>
+</div>
+<div class="mcp-live-bottom">
+<div>
+<small>WORKSPACE</small>
+<strong id="workspaceId">—</strong>
+</div>
+<div>
+<small>ÚLTIMA SINCRONIZACIÓN</small>
+<strong id="lastSync">—</strong>
+</div>
+<div class="live-current-task">
+<small>TAREA ACTUAL</small>
+<strong id="currentTask">Leyendo estado de Concord…</strong>
+</div>
+</div>
+</section>
+
+          <section class="stats-grid" aria-label="Resumen">
+<article class="stat-card">
+<div class="stat-head">AGENTES ACTIVOS <span class="stat-icon purple">◎</span>
+</div>
+<div class="stat-number" id="activeAgents">—<span class="stat-caption"> desde Concord</span>
+</div>
+<div class="stat-foot">
+<span class="foot-check">●</span> Presencia real del workspace</div>
+</article>
+<article class="stat-card">
+<div class="stat-head">TAREAS EN CURSO <span class="stat-icon blue">◷</span>
+</div>
+<div class="stat-number" id="activeTasks">—<span class="stat-caption"> tareas</span>
+</div>
+<div class="stat-foot">
+<span class="foot-check">↗</span> Estado real de las tareas</div>
+</article>
+<article class="stat-card">
+<div class="stat-head">COMPLETADAS <span class="stat-icon green">✓</span>
+</div>
+<div class="stat-number" id="completedTasks">—<span class="stat-caption"> tareas</span>
+</div>
+<div class="stat-foot">
+<span class="foot-check">↗</span> Registradas por agentes</div>
+</article>
+<article class="stat-card">
+<div class="stat-head">EVENTOS MCP <span class="stat-icon amber">⌁</span>
+</div>
+<div class="stat-number" id="eventCount">—<span class="stat-caption"> eventos</span>
+</div>
+<div class="stat-foot">
+<span class="foot-check">↻</span> Se actualiza automáticamente</div>
+</article>
+</section>
+
+          <div class="section-heading">
+<div>
+<h2>Tablero de misión</h2>
+<p>Tareas sincronizadas desde el estado exportado de Concord.</p>
+</div>
+<button class="subtle-button" id="refreshButton">↻ <span>Actualizar</span>
+</button>
+</div>
+          <section class="board" id="tasks">
+            <div class="board-column" data-column="todo">
+<div class="column-head">
+<span class="column-mark queued">
+</span>
+<span>POR HACER</span>
+<span class="column-count" id="countTodo">0</span>
+</div>
+<div class="task-list" id="todoTasks"></div>
+<div class="empty-note board-empty">No hay tareas por hacer.</div>
+</div>
+            <div class="board-column" data-column="active">
+<div class="column-head">
+<span class="column-mark progress">
+</span>
+<span>EN PROGRESO</span>
+<span class="column-count" id="countActive">0</span>
+</div>
+<div class="task-list" id="activeTaskList"></div>
+<div class="empty-note board-empty">No hay tareas activas.</div>
+</div>
+            <div class="board-column" data-column="complete">
+<div class="column-head">
+<span class="column-mark done">
+</span>
+<span>COMPLETADAS</span>
+<span class="column-count" id="countComplete">0</span>
+</div>
+<div class="task-list" id="completeTasks"></div>
+<div class="empty-note board-empty">Aún no hay entregas completadas.</div>
+</div>
+          </section>
+
+          <div class="bottom-grid">
+<section class="activity-panel" id="activity">
+<div class="panel-heading">
+<div>
+<h2>Actividad MCP real</h2>
+<p>Eventos guardados por Concord en este workspace</p>
+</div>
+<button class="dots-button">···</button>
+</div>
+<div class="activity-list" id="activityList">
+<p class="live-placeholder">Esperando eventos de Concord…</p>
+</div>
+</section>
+            <section class="agents-panel" id="agents">
+<div class="panel-heading">
+<div>
+<h2>Agentes presentes</h2>
+<p>Leídos desde el workspace de Concord</p>
+</div>
+</div>
+<div id="agentList" class="live-agent-list">
+<p class="live-placeholder">Esperando el estado del workspace…</p>
+</div>
+<div class="agents-footer">
+<span id="agentFooter">Sincronización local de Concord</span>
+<span class="sync-icon">↗</span>
+</div>
+</section>
+</div>
+          <footer class="footer">
+<span>ORBIT <b>×</b> CONCORD MCP</span>
+<span>HECHO PARA EXPLORAR LO IMPOSIBLE <span class="footer-star">✳</span>
+</span>
+<span>v0.1.0 · LOCAL</span>
+</footer>
+        </section>
+      </main>
+    </div>
+    <div class="toast" id="toast" role="status">✦ <span>La misión está en marcha.</span>
+</div>
+    <script src="app.js">
+</script>
+  </body>
+</html>

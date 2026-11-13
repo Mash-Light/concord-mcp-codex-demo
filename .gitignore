@@ -1,0 +1,14 @@
+node_modules/
+.concord/
+.playwright-mcp/
+.mcp.json
+.cursor/
+.agents/
+.devin/
+.gemini/
+.grok/
+.qwen/
+.github/copilot-instructions.md
+.github/mcp.json
+.codex/
+CLAUDE.md

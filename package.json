@@ -1,0 +1,8 @@
+{
+  "name": "orbit-concord-demo",
+  "version": "1.0.0",
+  "description": "A read-only mission-control dashboard for Concord MCP workspace state",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
