@@ -1,51 +1,69 @@
-# ORBIT — Concord MCP Mission Control
+# ORBIT for Concord
 
-A small local dashboard that makes Concord MCP's shared agent state visible: active sessions, task status, and the event trail. The UI reads Concord's generated workspace files; it does not send prompts or write tasks.
+ORBIT is a local, read-only mission-control interface for a Concord workspace. It presents real agent presence, task state, and workflow event metadata without claiming access to MCP server catalogs or tool-call results that Concord does not currently export to this view.
 
-![ORBIT dashboard showing live Concord workspace state](screenshots/orbit-dashboard.png)
+![ORBIT workspace overview](screenshots/orbit-dashboard.png)
 
-![Responsive ORBIT dashboard on mobile](screenshots/orbit-mobile.png)
+## What the data represents
 
-## What this demonstrates
+The dashboard reads Concord's generated `.concord/WORK_STATE.json` and `.concord/events.jsonl` files through a loopback-only Node server. The UI refreshes every 5.5 seconds and also supports manual refresh and task search.
 
-Concord MCP gives coding agents a shared local work state. Agents can claim tasks, see ownership and overlap warnings, record handoffs, and leave review evidence. The MCP connection does not change a project's visual interface on its own. ORBIT adds a read-only dashboard so those workspace changes are visible.
+The available feed contains:
+
+- **Presence:** agents Concord reports as live.
+- **Tasks:** workspace tasks grouped by their recorded status.
+- **Activity:** workflow event names, task IDs, statuses, and timestamps.
+
+The current feed does not expose a complete MCP server registry, tool schemas, or full MCP execution results. ORBIT therefore does not invent online server badges, tool counts, execution charts, or success rates. Its green availability state means the local workspace files were readable; it does not assert that an MCP server is connected.
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-    A[Codex / coding agent] -->|MCP workflow tools| B[Concord MCP]
-    B --> C[(.concord/concord.db)]
-    B --> D[WORK_STATE.json + events.jsonl]
-    E[Node.js local server] -->|read-only API| D
-    F[ORBIT dashboard] -->|polls every 4 seconds| E
+    A[Codex] -->|Concord workflow tools| B[Concord MCP]
+    B --> C[(Local workspace state)]
+    C -->|WORK_STATE.json + events.jsonl| D[Node read-only API]
+    D -->|minimal fields| E[Concord repository]
+    E --> F[Reusable UI components]
 ```
+
+The code keeps the browser data source, domain mapping, UI components, rendering, and server responsibilities separate. There are no project runtime dependencies; the backend uses Node's built-in modules and the frontend uses native ES modules.
 
 ## Project structure
 
 ```text
 .
-├── index.html          Dashboard layout
-├── styles.css          Responsive dark interface
-├── app.js              Renders live workspace state and event history
-├── server.js           Local, read-only HTTP server and state endpoint
-├── package.json        npm start script; no project dependencies
-├── screenshots/        Portfolio screenshot
-├── AGENTS.md           Concord workflow instructions for coding agents
-└── .concord/           Local database and generated state (ignored by Git)
+├── index.html                       Semantic app shell and navigation
+├── styles.css                       Design tokens, components, motion, responsive rules
+├── app.js                           Browser bootstrap, polling, search, mobile navigation
+├── server.js                        Loopback server and allow-listed read-only API
+├── src/
+│   ├── data/concordRepository.js    Fetches the local workspace feed
+│   ├── domain/workspace.js          Normalizes tasks, presence, events, and metrics
+│   └── ui/
+│       ├── components.js            Shared task, event, and agent renderers
+│       ├── icons.js                 One consistent SVG icon set
+│       └── renderWorkspace.js       Maps domain data to the dashboard
+├── screenshots/                     Desktop and mobile captures
+└── AGENTS.md                        Concord workflow instructions
 ```
 
 ## Run locally
 
-Requirements: Node.js 18 or newer, npm, and the Concord MCP package.
+Requirements: Node.js 18 or newer, npm, and Concord MCP installed and configured for this folder.
+
+```bash
+npm start
+```
+
+Open [http://127.0.0.1:4173](http://127.0.0.1:4173). Keep the terminal open while using the dashboard. If the Concord state file is missing or cannot be parsed, ORBIT shows an unavailable state and keeps any prior display marked as potentially stale.
+
+To create the local Concord workspace if needed:
 
 ```bash
 npm install -g @concord-ai/concord-mcp
 concord setup --no-global
-npm start
 ```
-
-Open [http://127.0.0.1:4173](http://127.0.0.1:4173). Keep the terminal running while viewing the dashboard. In Codex, restart the Concord MCP server and trust its hooks if you want live agent-to-agent delivery; the dashboard itself reads local exported state and does not require an API key.
 
 On Windows Command Prompt, telemetry can be disabled for the setup command with:
 
@@ -53,12 +71,24 @@ On Windows Command Prompt, telemetry can be disabled for the setup command with:
 set CONCORD_TELEMETRY_DISABLED=1 && concord setup --no-global
 ```
 
-Use **Ctrl+C** in the terminal to stop the local server.
+Use **Ctrl+C** in the terminal to stop the server.
+
+## Design and interaction
+
+The interface uses a single tokenized visual system, reusable rendering helpers, a restrained lime signal palette, keyboard focus rings, a responsive navigation drawer, task search, gentle hover feedback, and reduced-motion support. Animations use CSS transforms and opacity and remain decorative; the actual state always comes from the local Concord feed.
+
+The visual direction applies selected principles from [`design-taste-frontend`](https://github.com/Leonxlnx/taste-skill): a clear hierarchy, one coherent component system, purposeful motion, visible focus, mobile-specific navigation, and no fictional product metrics. The larger site kit was not copied into this repository because it would add unused assets and a second styling system.
 
 ## Data and privacy
 
-The server binds only to `127.0.0.1`, exposes only the three front-end files and a read-only `/api/state` endpoint, and reads `.concord/WORK_STATE.json` plus `.concord/events.jsonl`. The generated database and workspace state stay local and are excluded from Git. No project dependencies, API keys, or hosted services are used.
+- The server binds only to `127.0.0.1`.
+- It only accepts `GET` requests and serves a fixed allow-list of app files.
+- `/api/state` returns selected task, presence, and event fields; it omits machine paths, branches, expected-file lists, agent IDs, and event details.
+- The database, workspace state, MCP config, and credentials remain local and are ignored by Git.
+- No API key, hosted backend, or frontend framework is used.
 
-## Concord workflow used in this demo
+## Screenshots
 
-The integration was exercised from Codex with `start_work`, `inspect_work`, and `finish_work`. The dashboard displays the resulting task, active agent, and MCP event history from the local Concord workspace.
+![Desktop layout](screenshots/orbit-dashboard.png)
+
+![Mobile layout](screenshots/orbit-mobile.png)
